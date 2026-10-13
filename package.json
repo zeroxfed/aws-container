@@ -1,10 +1,11 @@
 {
-  "name": "aws-container",
+  "name": "my-node-app",
   "version": "1.0.0",
   "description": "A simple Node.js HTTP server",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "node --test"
   },
   "private": true
 }

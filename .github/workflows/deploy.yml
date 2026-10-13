@@ -88,3 +88,26 @@ jobs:
           NEW_REVISION=$(echo "$NEW_TASK_RESP" | jq -r '.taskDefinition.family + ":" + (.taskDefinition.revision | tostring)')
           aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_PRODUCTION }} --service ${{ vars.ECS_SERVICE_PRODUCTION }} --task-definition "$NEW_REVISION" --region ${{ vars.AWS_REGION }}
           aws ecs wait services-stable --cluster ${{ vars.ECS_CLUSTER_PRODUCTION }} --services ${{ vars.ECS_SERVICE_PRODUCTION }} --region ${{ vars.AWS_REGION }}
+
+- name: Deploy to ECS
+  run: |
+    set -Eeuo pipefail
+
+    echo "Step 1: Checking task definition"
+    aws ecs describe-task-definition \
+      --task-definition aws-container-task \
+      --region us-east-1
+
+    echo "Step 2: Checking ECS service"
+    aws ecs describe-services \
+      --cluster ci-cd-cluster \
+      --services ci-cd-service \
+      --region us-east-1
+
+    echo "Step 3: Checking ECS service events"
+    aws ecs describe-services \
+      --cluster ci-cd-cluster \
+      --services ci-cd-service \
+      --region us-east-1 \
+      --query 'services[0].events[:10].[createdAt,message]' \
+      --output table
